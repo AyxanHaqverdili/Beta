@@ -1,0 +1,138 @@
+import os
+import random
+import platform
+W=[[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[2,5,8],[3,6,9],[1,5,9],[3,5,7]] #Winner combinations
+B_Dict={1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9} #The Board
+###############################
+def Clear():
+    if platform.system()=='Windows':
+        os.system('cls')
+    elif platform.system()=='Linux':
+        os.system('clear')
+    else:
+        print('What kinda OS is this???')
+###############################
+def Free(List_Free):
+    for sq in List_Free:       
+         if not str(B_Dict[sq]).isdigit():
+            List_Free.remove(sq)
+    return List_Free
+###############################
+
+
+def Chck_If_In(S_List,M_List,Numb):#Check If Numb elements of S_List in M_List
+  counter=0
+  for item in S_List:
+    if item in M_List:
+      counter+=1
+  if counter==Numb:
+    return True
+###############################
+def Corner():
+    global Corners
+    Corners=[1,3,7,9]
+    if Free(Corners):
+        N_M=Corners[random.randint(0,len(Corners)-1)]
+    else :
+       N_M=random.randint(1,9)
+    while not str(B_Dict[N_M]).isdigit():
+              N_M=random.randint(1,9)
+    return N_M
+###############################
+def LOGIC(The_List_E,The_List_U):
+    for sq in range(1,10):
+        if str(B_Dict[sq]).isdigit() and (Win(The_List_U+[sq])):
+            return sq
+            break
+    for sq in range(1,10):
+        if str(B_Dict[sq]).isdigit() and (Win(The_List_E+[sq])):
+            return sq
+            break
+
+
+
+    else:
+        if B_Dict[5]=='X':
+            return Corner()
+        elif B_Dict[5]=='O' and (((B_Dict[1]=='X') and (B_Dict[9]=='X')) or ((B_Dict[3]=='X') and (B_Dict[7]=='X'))):
+            N_M=2*(random.randint(1,4))
+            while not str(B_Dict[N_M]).isdigit():
+                N_M=2*(random.randint(1,4))
+            return N_M
+        elif str(B_Dict[5]).isdigit():
+            return 5
+        else:
+            return random.randint(1,9)
+
+###############################
+def Win(The_List): #Determine the winner/Next Move
+  for Wn in W:
+    if Chck_If_In(Wn,The_List,3):
+      return True
+      break
+  else:
+    return False
+###############################
+
+
+def Print_Board(B_Dict):#Print the current state of the board
+  Clear()
+  counter=1
+  for d in B_Dict:
+    print('|',end=(''))
+    print(B_Dict[d],end=('|'))
+    if counter==3:
+      print('\n---------')
+      counter=1
+    else:
+      counter+=1
+###############################
+
+def Game_Play():#Play the Actual Game
+  Print_Board(B_Dict)
+  global times_played#how many times the input was used
+  times_played=0
+  while(True):
+    if times_played==9:
+      break
+    else:
+      X=int(input('Enter X: '))
+      while (X not in range(1,10)) or (X in List_X) or (X in List_O):
+        X=int(input('This place is occupied or doesn\'t exist, pls enter X again: '))
+      times_played+=1
+      B_Dict[X]='X'
+      List_X.append(X)
+      Print_Board(B_Dict)
+      if Win(List_X):
+        return 'X'
+        break
+    if times_played==9:
+      break
+    else:
+      #O=int(input('Enter O: '))
+      O=LOGIC(List_X,List_O)
+      while (O not in range(1,10)) or (O in List_X) or (O in List_O):
+        #O=int(input('This place is occupied or doesn\'t exist, pls enter O again: '))
+        O=LOGIC(List_X,List_O)
+      times_played+=1
+      B_Dict[O]='O'
+      List_O.append(O)
+      Print_Board(B_Dict)
+      if Win(List_O):
+        return 'O'
+        break
+###############################
+
+
+############ MAIN ##############
+List_X=[]
+List_O=[]
+winner=Game_Play()
+if(winner):
+  print(winner,'WINS!')
+else:
+  print('No One Wins HAHAHA (evil laugh)')
+
+############ ENDING ##############
+input('PRESS ANY KEY TO CLOSE')
+
